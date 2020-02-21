@@ -16,35 +16,19 @@ table = table1.append(table2)
 table.columns = [v for v in table.columns[:1]] + ["MIC_val"] + [v for v in table.columns[2:]]
 dummies = pd.get_dummies(table.Antibiotic)
 table = pd.concat([table, dummies], axis=1)
-X = table.drop(table.columns[1], axis=1).drop("Antibiotic", axis=1)
+X_ = table.drop(table.columns[1], axis=1).drop("Antibiotic", axis=1)
+# need to delete one more column for easy factorization
+X = X_.drop(X_.columns[9090], axis=1).drop("AMC", axis=1)
+
 y = table.iloc[:, 1]
-#print("table:")
-#print(table)
-#print("X:")
-#print(X)
-#print("Y:")
-#print(y)
 # Train test split
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=42)
 y_test_up = pd.DataFrame([str(float(x) + 1) for x in y_test]).iloc[:, 0]
 y_test_down = pd.DataFrame([str(float(x) - 1) for x in y_test]).iloc[:, 0]
 
-#from tabulate import tabulate
-#print(tabulate(X_train, headers='keys', tablefmt='psql'))
-#print("X_train:")
-#print(X_train)
-print("X_train:")
-print(X_train)
-#print("y_train:")
-#print(y_train)
+X_train = X_train.values.reshape(3957, 71, 128, 1)
+X_test = X_test.values.reshape(1320, 71, 128, 1)
 
-X_train = X_train.values.reshape(3957, 9091, 1, 1)
-X_test = X_test.values.reshape(1320, 9091, 1, 1)
-print("After reshaping X_train:")
-print(X_train)
-
-
-quit()
 
 # can't convert float to categorical so:
 a_train = {}
@@ -62,25 +46,19 @@ for item, i in zip(y_test, range(len(y_test))):
 
 y_train = util.to_categorical(classes_train)
 y_test = util.to_categorical(classes_test)
-# print out a couple samples
-#for feat, targ in dataset.take(5):
-#  print ('Features: {}, Target: {}'.format(feat, targ))
 
 kmers = len(X.columns)
+print("kmers=", kmers)
 
 model = tf.keras.Sequential([
-    tf.keras.layers.Conv2D(kmers, kernel_size = 1, activation='relu'),
-    #tf.keras.layers.Conv2D(kmers/2, kernel_size = 3, activation='relu'),
+    tf.keras.layers.Conv2D(64, kernel_size = 3, activation='relu'),
+    tf.keras.layers.Conv2D(32, kernel_size = 3, activation='relu'),
     tf.keras.layers.Flatten(),
     tf.keras.layers.Dense(1)
     ])
 
 model.compile(optimizer='adam',
-    loss=tf.keras.losses.BinaryCrossentropy(from_logits=True),
+    loss=tf.keras.losses.mean_squared_error,
     metrics=['accuracy'])
 
 model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=2)
-
-print('\n# Evaluate on test data')
-results = model.evaluate(val_dataset)
-print('test loss, test acc:', results)
