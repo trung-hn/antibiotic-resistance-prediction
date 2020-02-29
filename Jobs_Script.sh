@@ -10,12 +10,10 @@
 #$ -M tnh48@drexel.edu
 ### project - basically, your research group name with "Grp" replaced by "Prj"
 #$ -P rosenclassPrj
-
-#$ -pe openmpi_ib 64
 ### request 15 min of wall clock time "h_rt" = "hard real time" (format is HH:MM:SS, or integer seconds)
-#$ -l h_rt=20:00:00
+#$ -l h_rt=48:00:00
 ### a hard limit 8 GB of memory per slot - if the job grows beyond this, the job is killed
-#$ -l h_vmem=64G
+#$ -l h_vmem=32G
 ### want nodes with at least 6 GB of free memory per slot
 #$ -l m_mem_free=16G
 ### select the queue all.q
@@ -36,5 +34,6 @@ module load gcc
 ### Add them below this line.
 module load python/anaconda3
 
-jupyter nbconvert --execute "test_nbconvert.ipynb"
-jupyter nbconvert --execute --to notebook "test_nbconvert.ipynb"
+python Trees_Classifier_TRUNG.py
+
+# jupyter nbconvert --execute --to notebook --NotebookApp.shutdown_no_activity_timeout=86000 --MappingKernelManager.cull_idle_timeout=86000 --MappingKernelManager.kernel_info_timeout=86000 --GatewayKernelManager.cull_idle_timeout=86000 --GatewayKernelManager.kernel_info_timeout=86000 "Trees_Classifier_TRUNG.ipynb"
