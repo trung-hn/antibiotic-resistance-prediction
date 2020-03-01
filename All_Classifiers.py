@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[11]:
 
 
 import pickle
@@ -42,6 +41,10 @@ for path, folders, files in all_files:
     if "SAL" in path and "k4" in path:
         SAL_4k_paths.append(path)
 
+
+try: os.mkdir("./Results")
+except: pass
+
 # ("SALCIP","SALFIS","SALNAL")
 # ("SALAUG","SALCOT","SALSTR")
 # ("SALAXO","SALGEN","SALTET")
@@ -77,7 +80,6 @@ for path in SAL_4k_paths:
         y_test_down = pd.DataFrame([str(float(x) - 1) for x in y_test]).iloc[:, 0]
 
         all_data_for_saving = [sal_name]
-        all_data_for_saving.append([])
 
         def create_confusion_matrix(y_test, y_pred):
             # Get the difference between pred and test data
@@ -94,23 +96,23 @@ for path in SAL_4k_paths:
             # Confusion matrix
             labels = [float(val) for val in sorted(set(y_test_numpy) | set(y_pred))]
             rv = sklearn.metrics.confusion_matrix(y_test_numpy.astype(float), y_pred2, labels=labels), labels
-            all_data_for_saving[-1].extend(rv)
+            all_data_for_saving.extend(rv)
             return rv
 
 
         def print_acc_cfm(y_test, y_pred, name):
-            all_data_for_saving[-1].append(name)
+            all_data_for_saving.append(name)
 
             # Prediction
             score = accuracy_score(y_test, y_pred)
             print(f"Accuracy: {score}")
-            all_data_for_saving[-1].append(f"Accuracy: {score}")
+            all_data_for_saving.append(f"Accuracy: {score}")
 
             # 2 dilutions Prediction
             score += accuracy_score(y_test_up, y_pred)
             score += accuracy_score(y_test_down, y_pred)
             print(f"Accuracy (2 dilutions): {score}")
-            all_data_for_saving[-1].append(f"Accuracy (2 dilutions): {score}")
+            all_data_for_saving.append(f"Accuracy (2 dilutions): {score}")
 
             # Confusion matrix
             print(create_confusion_matrix(y_test, y_pred))
@@ -159,7 +161,7 @@ for path in SAL_4k_paths:
 
         try:
             current_time = datetime.now().strftime("%H-%M-%S_%m-%d-%Y")
-            with open(f"results/{sal_name}_{current_time}.log", "w") as f:
-                f.writelines(f"{val}\n" for val in all_data_for_saving)
+            with open(f"./Results/{sal_name}_{current_time}.log", "w") as f:
+                f.write("\n".join(str(val) for val in all_data_for_saving))
         except:
             print(f"Error with saving data for {sal_name}", e)
