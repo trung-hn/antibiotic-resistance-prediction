@@ -1,12 +1,12 @@
 # Progress:
 
-|No.| Task | Float MIC? | Finished?| Account for Float MIC? |
+|No.| Task | Float MIC? | Finished?| Dealing with Float MIC |
 |----|----|----|----|----|
-|1  | SALCIP | Yes | Yes  | No
+|1  | SALCIP | Yes | Yes  | Rounding to nearest int
 |2  | SALFIS | No  | Yes | N/A
 |3  | SALNAL | No  | Yes | N/A
 |4  | SALAUG | No  | Yes | N/A
-|5  | SALCOT | Yes | Yes | No
+|5  | SALCOT | Yes | Yes | Rounding to nearest int
 |6  | SALSTR | No  | Yes | N/A
 |7  | SALAXO | No  | Yes | N/A
 |8  | SALGEN | No  | Yes | N/A
