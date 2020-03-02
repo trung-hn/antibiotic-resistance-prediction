@@ -52,7 +52,7 @@ except: pass
 # ("SALAZI","SALTIO","SALKAN")
 for path in SAL_4k_paths:
     sal_name = path.rsplit("/", 2)[1]
-    if sal_name in ("SALAXO","SALGEN","SALTET","SALCHL","SALAMP","SALFOX"):
+    if sal_name in ("SALFOX","SALAZI","SALTIO", "SALKAN"):
         print(f"Start {sal_name}")
         f0 = f"{path}/TRAININGDATA.{sal_name}.xlsx K4-Part0.p"
         f1 = f"{path}/TRAININGDATA.{sal_name}.xlsx K4-Part1.p"

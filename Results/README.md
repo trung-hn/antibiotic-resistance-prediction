@@ -10,9 +10,9 @@
 |6  | SALSTR | No  | Yes | N/A
 |7  | SALAXO | No  | Yes | N/A
 |8  | SALGEN | No  | Yes | N/A
-|9  | SALTET | No  |  | N/A
-|10 | SALCHL | No  |  | N/A
-|11 | SALAMP | No  |  | N/A
+|9  | SALTET | No  | Yes | N/A
+|10 | SALCHL | No  | Yes | N/A
+|11 | SALAMP | No  | Yes | N/A
 |12 | SALFOX | No  |  | N/A
 |13 | SALAZI | No  |  | N/A
 |14 | SALTIO | No  |  | N/A
