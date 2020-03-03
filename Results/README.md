@@ -13,7 +13,7 @@
 |9  | SALTET | No  | Yes | N/A
 |10 | SALCHL | No  | Yes | N/A
 |11 | SALAMP | No  | Yes | N/A
-|12 | SALFOX | No  |  | N/A
-|13 | SALAZI | No  |  | N/A
-|14 | SALTIO | No  |  | N/A
+|12 | SALFOX | No  | Yes | N/A
+|13 | SALAZI | No  | Yes | N/A
+|14 | SALTIO | No  | Yes | N/A
 |15 | SALKAN | No  | Yes | N/A
