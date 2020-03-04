@@ -46,6 +46,11 @@ stdout will be returned as report file
   - SALTIO {'3.0', '-2.0', '4.0', '-1.0', '0.0', '2.0', '1.0'}
   - SALKAN {'5.0', '3.0', '7.0', '4.0', '6.0'}
 
+Need to add:
+- Precision and recall
+- k-fold
+- MSE
+
 
 From Taha:
 - Run each model on each antibiotic meaning we have a different model for each antibiotic

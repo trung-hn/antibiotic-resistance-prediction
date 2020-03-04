@@ -16,6 +16,7 @@ from sklearn.cluster import KMeans
 from sklearn.neural_network import MLPClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import KFold
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import confusion_matrix
 # from sklearn.metrics import plot_confusion_matrix
@@ -45,6 +46,59 @@ for path, folders, files in all_files:
 try: os.mkdir("./Results")
 except: pass
 
+# FUNCTION DEF
+def get_2_dil_acc_cfm(y_test, y_pred, labels):
+    # Get the difference between pred and test data
+    diff = y_pred.astype(float) - y_test.astype(float)
+
+    # only keep +- 1 dilutions
+    diff[diff > 1]=0
+    diff[diff < -1]=0
+
+    # force pred values to match +- 1 actual values 
+    y_pred_2_dil = y_pred.astype(float) - diff
+
+    # Calculate 2-dilution acc
+    score = sum(y_test.astype(float) == y_pred_2_dil) / len(y_test)
+
+    # Confusion matrix
+    return score, sklearn.metrics.confusion_matrix(y_test.astype(float), y_pred_2_dil, labels=labels)
+
+
+def k_fold_calculation(clf, X, y, name, labels):
+    all_data_for_saving.append(name)
+    acc_avg = 0
+    kf = KFold(n_splits=10)
+    for index, (train, test) in enumerate(kf.split(X,y=y)):
+        X_train = X.values[train,:]
+        y_train = y.values[train]
+
+        X_test = X.values[test,:]
+        y_test = y.values[test]
+
+        clf.fit(X_train, y_train)
+        y_pred = clf.predict(X_test)
+
+        score, cfm = get_2_dil_acc_cfm(y_test, y_pred, labels)
+        acc_avg += score/10
+        print(f"Validation index {index}: Accuracy (2 dilutions): {score}")
+        print(cfm)
+        all_data_for_saving.append(f"Validation index {index}: Accuracy (2 dilutions): {score}")
+        all_data_for_saving.append(cfm)
+        
+        if index == 0:
+            avg_cfm = cfm
+        else:
+            avg_cfm = avg_cfm + cfm
+    print("Average stats:")
+    print(f"Accuracy (2 dilutions): {acc_avg}")
+    print(avg_cfm//10)    
+    all_data_for_saving.append(f"Accuracy (2 dilutions): {acc_avg}")
+    all_data_for_saving.append(avg_cfm//10)
+    all_data_for_saving.append(labels)
+    
+all_data_for_saving = []
+    
 # ("SALCIP","SALFIS","SALNAL")
 # ("SALAUG","SALCOT","SALSTR")
 # ("SALAXO","SALGEN","SALTET")
@@ -52,7 +106,8 @@ except: pass
 # ("SALAZI","SALTIO","SALKAN")
 for path in SAL_4k_paths:
     sal_name = path.rsplit("/", 2)[1]
-    if sal_name in ("SALFOX","SALAZI","SALTIO", "SALKAN"):
+    if sal_name in ("SALKAN"):
+        all_data_for_saving = [sal_name]
         print(f"Start {sal_name}")
         f0 = f"{path}/TRAININGDATA.{sal_name}.xlsx K4-Part0.p"
         f1 = f"{path}/TRAININGDATA.{sal_name}.xlsx K4-Part1.p"
@@ -73,91 +128,37 @@ for path in SAL_4k_paths:
         # for 4 mers
         X = df.drop(columns=["Antibiotic", "MIC"], axis=1) # pick every but (Antibiotic, MIC)
         y = df.iloc[:,1] # pick 2nd column (MIC values)
-
-        # Train Test Split
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-        y_test_up = pd.DataFrame([str(float(x) + 1) for x in y_test]).iloc[:, 0]
-        y_test_down = pd.DataFrame([str(float(x) - 1) for x in y_test]).iloc[:, 0]
-
-        all_data_for_saving = [sal_name]
-
-        def create_confusion_matrix(y_test, y_pred):
-            # Get the difference between pred and test data
-            y_test_numpy = y_test.values
-            diff = y_pred.astype(float) - y_test_numpy.astype(float)
-
-            # only keep +- 1 dilutions
-            diff[diff > 1]=0
-            diff[diff < -1]=0
-
-            # force pred values to match +- 1 actual values 
-            y_pred2 = y_pred.astype(float) - diff
-
-            # Confusion matrix
-            labels = [float(val) for val in sorted(set(y_test_numpy) | set(y_pred))]
-            rv = sklearn.metrics.confusion_matrix(y_test_numpy.astype(float), y_pred2, labels=labels), labels
-            all_data_for_saving.extend(rv)
-            return rv
-
-
-        def print_acc_cfm(y_test, y_pred, name):
-            all_data_for_saving.append(name)
-
-            # Prediction
-            score = accuracy_score(y_test, y_pred)
-            print(f"Accuracy: {score}")
-            all_data_for_saving.append(f"Accuracy: {score}")
-
-            # 2 dilutions Prediction
-            score += accuracy_score(y_test_up, y_pred)
-            score += accuracy_score(y_test_down, y_pred)
-            print(f"Accuracy (2 dilutions): {score}")
-            all_data_for_saving.append(f"Accuracy (2 dilutions): {score}")
-
-            # Confusion matrix
-            print(create_confusion_matrix(y_test, y_pred))
-
+        
+        labels = set(y.astype("float"))
+        labels = sorted(labels)        
+        
         print("Start Naive Bayes")
         clf = GaussianNB()
-        clf.fit(X_train, y_train)
-        y_pred = clf.predict(X_test)
-        print_acc_cfm(y_test, y_pred, "Naive Bayes")
+        k_fold_calculation(clf, X, y, "Naive Bayes", labels)
         
         print("Start KNN")
         clf = KNeighborsClassifier(n_neighbors=20, weights='uniform', algorithm='auto', leaf_size=30, p=2)
-        clf.fit(X_train, y_train)
-        y_pred = clf.predict(X_test)
-        print_acc_cfm(y_test, y_pred, "KNN")
+        k_fold_calculation(clf, X, y, "KNN", labels)
 
-        print("Start SVM")
-        clf = svm.SVC()
-        clf.fit(X_train, y_train)
-        y_pred = clf.predict(X_test)
-        print_acc_cfm(y_test, y_pred, "SVM")
+        # print("Start SVM")
+        # clf = svm.SVC()
+        # k_fold_calculation(clf, X, y, "SVM", labels)
+        
+        # print("Start Decision tree")
+        # clf = tree.DecisionTreeClassifier()
+        # k_fold_calculation(clf, X, y, "Decision tree", labels)
+        
+        # print("Start Random Forest")
+        # clf = ensemble.RandomForestClassifier(n_estimators=100, max_features="auto",random_state=0)
+        # k_fold_calculation(clf, X, y, "Random Forest", labels)
 
-        print("Start Decision tree")
-        clf = tree.DecisionTreeClassifier()
-        clf.fit(X_train, y_train)
-        y_pred = clf.predict(X_test)
-        print_acc_cfm(y_test, y_pred, "Decision Tree")
+        # print("Start AdaBoost")
+        # clf = ensemble.AdaBoostClassifier(n_estimators=100)
+        # k_fold_calculation(clf, X, y, "Adaboost", labels)
 
-        print("Start Random Forest")
-        clf = ensemble.RandomForestClassifier(n_estimators=100, max_features="auto",random_state=0)
-        clf.fit(X_train, y_train)
-        y_pred = clf.predict(X_test)
-        print_acc_cfm(y_test, y_pred, "Random Forest")
-
-        print("Start AdaBoost")
-        clf = ensemble.AdaBoostClassifier(n_estimators=100)
-        clf.fit(X_train, y_train)
-        y_pred = clf.predict(X_test)
-        print_acc_cfm(y_test, y_pred, "AdaBoost")
-
-        print("Start Gradient Boosting")
-        clf = ensemble.GradientBoostingClassifier(n_estimators=100)
-        clf.fit(X_train, y_train)
-        y_pred = clf.predict(X_test)
-        print_acc_cfm(y_test, y_pred, "GradientBoost")
+        # print("Start Gradient Boosting")
+        # clf = ensemble.GradientBoostingClassifier(n_estimators=100)
+        # k_fold_calculation(clf, X, y, "GradientBoost", labels)
 
         try:
             current_time = datetime.now().strftime("%H-%M-%S_%m-%d-%Y")
