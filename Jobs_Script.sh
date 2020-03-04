@@ -34,7 +34,13 @@ module load gcc
 ### Add them below this line.
 module load python/anaconda3
 
-for anti in /lustre/scratch/tv349/AMR/BinaryPTrainingData/SAL*
+# run all
+# runs=( /lustre/scratch/tv349/AMR/BinaryPTrainingData/SAL* )
+
+# run list
+runs=(SALAMP SALAUG SALAXO SALAZI SALCHL SALCIP SALCOT SALFIS SALFOX SALGEN SALKAN SALNAL SALSTR SALTET SALTIO)
+
+for anti in ${runs[@]}
 do
     anti=`basename $anti`
     echo "Running $anti"
