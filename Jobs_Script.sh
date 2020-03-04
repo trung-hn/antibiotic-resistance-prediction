@@ -34,9 +34,9 @@ module load gcc
 ### Add them below this line.
 module load python/anaconda3
 
-cd /lustre/scratch/tv349/AMR/BinaryPTrainingData
-for anti in SAL*
+for anti in /lustre/scratch/tv349/AMR/BinaryPTrainingData/SAL*
 do
+    anti=`basename $anti`
     echo "Running $anti"
     python All_Classifiers.py $anti
 done
