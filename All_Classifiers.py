@@ -4,6 +4,7 @@
 
 
 import pickle
+import sys
 import pandas as pd
 # import seaborn as sn
 import sklearn
@@ -104,9 +105,14 @@ all_data_for_saving = []
 # ("SALAXO","SALGEN","SALTET")
 # ("SALCHL","SALAMP","SALFOX")
 # ("SALAZI","SALTIO","SALKAN")
+antibiotics = ["SALKAN"]
+if len(sys.argv) > 1:
+    antibiotics = sys.argv[1:]
+
+print(antibiotics)
 for path in SAL_4k_paths:
     sal_name = path.rsplit("/", 2)[1]
-    if sal_name in ("SALKAN"):
+    if sal_name in antibiotics:
         all_data_for_saving = [sal_name]
         print(f"Start {sal_name}")
         f0 = f"{path}/TRAININGDATA.{sal_name}.xlsx K4-Part0.p"

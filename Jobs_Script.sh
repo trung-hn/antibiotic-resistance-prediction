@@ -34,6 +34,11 @@ module load gcc
 ### Add them below this line.
 module load python/anaconda3
 
-python All_Classifiers.py
+cd /lustre/scratch/tv349/AMR/BinaryPTrainingData
+for anti in SAL*
+do
+    echo "Running $anti"
+    python All_Classifiers.py $anti
+done
 
 # jupyter nbconvert --execute --to notebook --NotebookApp.shutdown_no_activity_timeout=86000 --MappingKernelManager.cull_idle_timeout=86000 --MappingKernelManager.kernel_info_timeout=86000 --GatewayKernelManager.cull_idle_timeout=86000 --GatewayKernelManager.kernel_info_timeout=86000 "Trees_Classifier_TRUNG.ipynb"
