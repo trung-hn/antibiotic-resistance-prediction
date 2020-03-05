@@ -44,7 +44,8 @@ for path, folders, files in all_files:
         SAL_4k_paths.append(path)
 
 
-try: os.mkdir("./Results")
+try:
+    os.mkdir("./Results")
 except: pass
 
 # FUNCTION DEF
@@ -78,12 +79,19 @@ def k_fold_calculation(clf, X, y, name, labels):
         y_test = y.values[test]
 
         clf.fit(X_train, y_train)
+        # save model
+        filename = "/scratch/ars443/Classifiers/" + name + str(index) + ".clf"
+        try:
+            pickle.dump(clf, open(filename, 'wb'))
+        except:
+            print('Cant save classifier to file: ', filename)
+        
         y_pred = clf.predict(X_test)
 
         score, cfm = get_2_dil_acc_cfm(y_test, y_pred, labels)
         acc_avg += score/10
-        print(f"Validation index {index}: Accuracy (2 dilutions): {score}")
-        print(cfm)
+        #print(f"Validation index {index}: Accuracy (2 dilutions): {score}")
+        #print(cfm)
         all_data_for_saving.append(f"Validation index {index}: Accuracy (2 dilutions): {score}")
         all_data_for_saving.append(cfm)
         
@@ -91,9 +99,9 @@ def k_fold_calculation(clf, X, y, name, labels):
             avg_cfm = cfm
         else:
             avg_cfm = avg_cfm + cfm
-    print("Average stats:")
-    print(f"Accuracy (2 dilutions): {acc_avg}")
-    print(avg_cfm//10)    
+    #print("Average stats:")
+    #print(f"Accuracy (2 dilutions): {acc_avg}")
+    #print(avg_cfm//10)    
     all_data_for_saving.append(f"Accuracy (2 dilutions): {acc_avg}")
     all_data_for_saving.append(avg_cfm//10)
     all_data_for_saving.append(labels)
@@ -138,13 +146,13 @@ for path in SAL_4k_paths:
         labels = set(y.astype("float"))
         labels = sorted(labels)        
         
-        print("Start Naive Bayes")
-        clf = GaussianNB()
-        k_fold_calculation(clf, X, y, "Naive Bayes", labels)
+        #print("Start Naive Bayes")
+        #clf = GaussianNB()
+        #k_fold_calculation(clf, X, y, "Naive Bayes", labels)
         
-        print("Start KNN")
-        clf = KNeighborsClassifier(n_neighbors=20, weights='uniform', algorithm='auto', leaf_size=30, p=2)
-        k_fold_calculation(clf, X, y, "KNN", labels)
+        #print("Start KNN")
+        #clf = KNeighborsClassifier(n_neighbors=20, weights='uniform', algorithm='auto', leaf_size=30, p=2)
+        #k_fold_calculation(clf, X, y, "KNN", labels)
 
         # print("Start SVM")
         # clf = svm.SVC()
@@ -154,9 +162,9 @@ for path in SAL_4k_paths:
         # clf = tree.DecisionTreeClassifier()
         # k_fold_calculation(clf, X, y, "Decision tree", labels)
         
-        # print("Start Random Forest")
-        # clf = ensemble.RandomForestClassifier(n_estimators=100, max_features="auto",random_state=0)
-        # k_fold_calculation(clf, X, y, "Random Forest", labels)
+        print("Start Random Forest")
+        clf = ensemble.RandomForestClassifier(n_estimators=200, max_features="auto",random_state=0)
+        k_fold_calculation(clf, X, y, "Random Forest", labels)
 
         # print("Start AdaBoost")
         # clf = ensemble.AdaBoostClassifier(n_estimators=100)
