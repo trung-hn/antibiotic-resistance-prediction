@@ -25,6 +25,7 @@ from sklearn.neighbors import KNeighborsClassifier
 from datetime import datetime
 import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.decomposition import PCA
 
 
 # Ref:
@@ -165,6 +166,12 @@ for path in SAL_4k_paths:
         print("Start Random Forest")
         clf = ensemble.RandomForestClassifier(n_estimators=200, max_features="auto",random_state=0)
         k_fold_calculation(clf, X, y, "Random Forest", labels)
+	pca = PCA(random_state=42)
+	pca.fit(X)
+	var = pca.explained_variance_ratio_
+	plt.plot((np.cumsum(var))
+	plt.title('PCA for Random Forest')
+	plt.savefig('./Results/pca_curve.png')
 
         # print("Start AdaBoost")
         # clf = ensemble.AdaBoostClassifier(n_estimators=100)
