@@ -109,11 +109,6 @@ def k_fold_calculation(clf, X, y, name, labels):
     
 all_data_for_saving = []
     
-# ("SALCIP","SALFIS","SALNAL")
-# ("SALAUG","SALCOT","SALSTR")
-# ("SALAXO","SALGEN","SALTET")
-# ("SALCHL","SALAMP","SALFOX")
-# ("SALAZI","SALTIO","SALKAN")
 antibiotics = ["SALKAN"]
 if len(sys.argv) > 1:
     antibiotics = sys.argv[1:]
@@ -143,17 +138,26 @@ for path in SAL_4k_paths:
         # for 4 mers
         X = df.drop(columns=["Antibiotic", "MIC"], axis=1) # pick every but (Antibiotic, MIC)
         y = df.iloc[:,1] # pick 2nd column (MIC values)
+       
+        # PCA of input data
+        pca = PCA(random_state=42)
+        pca.fit(X)
+        var = pca.explained_variance_ratio_
+        plt.plot((np.cumsum(var)))
+        plt.title('PCA for Random Forest')
+        plt.savefig(f"./Results/{sal_name}_pca.png")
         
+        # get all unique labels
         labels = set(y.astype("float"))
         labels = sorted(labels)        
         
-        #print("Start Naive Bayes")
-        #clf = GaussianNB()
-        #k_fold_calculation(clf, X, y, "Naive Bayes", labels)
+        print("Start Naive Bayes")
+        clf = GaussianNB()
+        k_fold_calculation(clf, X, y, "Naive Bayes", labels)
         
-        #print("Start KNN")
-        #clf = KNeighborsClassifier(n_neighbors=20, weights='uniform', algorithm='auto', leaf_size=30, p=2)
-        #k_fold_calculation(clf, X, y, "KNN", labels)
+        print("Start KNN")
+        clf = KNeighborsClassifier(n_neighbors=20, weights='uniform', algorithm='auto', leaf_size=30, p=2)
+        k_fold_calculation(clf, X, y, "KNN", labels)
 
         # print("Start SVM")
         # clf = svm.SVC()
@@ -166,16 +170,10 @@ for path in SAL_4k_paths:
         print("Start Random Forest")
         clf = ensemble.RandomForestClassifier(n_estimators=200, max_features="auto",random_state=0)
         k_fold_calculation(clf, X, y, "Random Forest", labels)
-	pca = PCA(random_state=42)
-	pca.fit(X)
-	var = pca.explained_variance_ratio_
-	plt.plot((np.cumsum(var))
-	plt.title('PCA for Random Forest')
-	plt.savefig('./Results/pca_curve.png')
 
-        # print("Start AdaBoost")
-        # clf = ensemble.AdaBoostClassifier(n_estimators=100)
-        # k_fold_calculation(clf, X, y, "Adaboost", labels)
+        print("Start AdaBoost")
+        clf = ensemble.AdaBoostClassifier(n_estimators=100)
+        k_fold_calculation(clf, X, y, "Adaboost", labels)
 
         # print("Start Gradient Boosting")
         # clf = ensemble.GradientBoostingClassifier(n_estimators=100)
