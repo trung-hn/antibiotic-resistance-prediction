@@ -12,6 +12,7 @@ stdout will be returned as report file
 
 /lustre/sratch/tnh48. Data are removed regularly. move to personal machine. 
 
+
 - Number of lines in each file:
     - SALCIP 1759 1759 1759
     - SALFIS 1643 1643 1643
@@ -51,6 +52,11 @@ Need to add:
 - k-fold
 - MSE
 
+- Below is a classification for who runs tests for which antibiotics
+    - Akash    - {SALCIP, SALFIS, SALNAL, SALTIO}
+    - Reno     - {SALAUG, SALCOT, SALAXO}
+    - Trung    - {SALGEN, SALTET, SALCHL}
+    - Jonathan - {SALAMP, SALFOX, SALKAN, SALSTR, SALAZI}
 
 From Taha:
 - Run each model on each antibiotic meaning we have a different model for each antibiotic
