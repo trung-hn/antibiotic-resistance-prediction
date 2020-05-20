@@ -10,7 +10,9 @@ qsub: used to submit write a `.sh` file to store all commands.
 
 stdout will be returned as report file
 
-/lustre/sratch/tnh48. Data are removed regularly. move to personal machine. 
+`/lustre/sratch/tnh48`. Data are removed regularly. move to personal machine. 
+
+Class folder: `/mnt/HA/groups/rosenclassGrp/`
 
 
 - Number of lines in each file:
